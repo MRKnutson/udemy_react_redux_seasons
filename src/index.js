@@ -1,17 +1,53 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import SeasonDisplay from "./SeasonDisplay";
+import Loader from "./Loader";
+// import "semantic-ui-css/semantic.min.css";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+// const App = () => {
+//   window.navigator.geolocation.getCurrentPosition(
+//     (position) => console.log(position),
+//     (err) => console.log(err)
+//   );
+
+//   return <div>Latitude: </div>;
+// };
+
+class App extends React.Component {
+  state = { lat: null, errorMessage: "" };
+
+  componentDidMount() {
+    window.navigator.geolocation.getCurrentPosition(
+      (position) => this.setState({ lat: position.coords.latitude }),
+      (err) => this.setState({ errorMessage: err.message })
+    );
+  }
+
+  renderContent() {
+    return (
+      <>
+        {this.state.lat ? <SeasonDisplay lat={this.state.lat} /> : null}
+        {this.state.errorMessage.length
+          ? `Error: ${this.state.errorMessage}`
+          : null}
+        {!this.state.lat && !this.state.errorMessage.length ? (
+          <Loader message="Please allow location use" />
+        ) : null}
+      </>
+    );
+  }
+
+  render() {
+    return (
+      <div style={{ border: "solid 10px black" }}>{this.renderContent()}</div>
+    );
+  }
+}
+
+// ReactDOM.render(<App />, document.querySelector("#root"));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <App />
   </React.StrictMode>
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
